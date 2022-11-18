@@ -33,7 +33,11 @@ def correct(input: TextIO, output: TextIO) -> None:
     Corrects typos from input file and write to output file.
     """
     for line in input:
-        fixed = fix_regular_typo(line.strip())
+        stripped_line = line.strip()
+        if len(stripped_line) <= 1:
+            output.write(stripped_line + "\n")
+            continue
+        fixed = fix_regular_typo(stripped_line)
         fixed = rules.apply_contextual_rules(fixed)
         output.write(fixed + "\n")
 
@@ -51,7 +55,8 @@ def main():
     # Read regular typos
     for line in open("regular.txt", "r", encoding="utf-8"):
         typo, replace = line.strip().split(",")
-        regular_typos.append((re.compile(typo.replace(" ", "\s*"), re.I), replace))
+        regular_typos.append(
+            (re.compile(typo.replace(" ", "\s*"), re.I), replace))
 
     outdir = pathlib.Path(args.outdir)
     for input, output in itertools.chain.from_iterable(

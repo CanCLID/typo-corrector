@@ -15,7 +15,7 @@ cjk_regex = f"[{han}{full_width_punct}{cjk_punct}{kana}{hangul}]"
 cjk_pattern = re.compile(rf"(?<={cjk_regex})\s+(?={cjk_regex})")
 number_pattern = re.compile(r"(?<={num})\s+(?={num})".format(num=r"[\d.,]"))
 
-zo_words = ["左側", "左右", "左邊", "左手", "左腳", "左方"]
+zo_words = ["左側", "左右", "左邊", "左手", "左腳", "左方", "左鄰", "左翼", "左膠", "左面"],
 
 
 class Context:
@@ -55,17 +55,33 @@ _handlers: dict[str, Callable[[Context], None]] = {}
 
 
 def segment_line(line: str) -> list[str]:
+    cjk = re.compile(cjk_regex)
+
     words = []
     segments = re.split(r"\s+", line)
     for seg in segments:
-        words += pycantonese.segment(seg)
+        if cjk.search(seg):
+            s = pycantonese.segment(seg)
+        # If the segment is not a CJK string, don't segment it,
+        # otherwise the segmentation will mess up the spacing
+        else:
+            s = [seg]
+        words.extend(s)
     return words
 
 
 def fix_space(line: str) -> str:
-    """Remove spaces between Han characters and non-Han characters."""
+    """
+    Remove spaces between Han characters and symbols according to the
+    Chinese copywriting guidelines.
+
+    See:
+    https://sparanoid.com/note/chinese-copywriting-guidelines/
+    """
     line = cjk_pattern.sub("", line)
-    return number_pattern.sub("", line)
+    line = number_pattern.sub("", line)
+
+    return line
 
 
 # Debugging purpose
