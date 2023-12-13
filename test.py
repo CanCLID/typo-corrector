@@ -27,13 +27,15 @@ def correct(line):
 
 def test_即係():
     # 遮
+    assert correct("遮係噉") == "即係噉"
     assert correct("哪！遮係噉") == "哪！即係噉"
     assert correct("落雨要擔遮係嗎？") == "落雨要擔遮係嗎？"
     assert correct("落雨要把遮係嗎？") == "落雨要把遮係嗎？"
     assert correct("落雨要收遮係嗎？") == "落雨要收遮係嗎？"
     assert correct("落雨要雨遮係嗎？") == "落雨要雨遮係嗎？"
 
-    # 姐      
+    # 姐
+    assert correct("姐係噉") == "即係噉"
     assert correct("哪！姐係噉") == "哪！即係噉"
     assert correct("我家姐係我親人") == "我家姐係我親人"
     assert correct("我表姐係我親人") == "我表姐係我親人"
